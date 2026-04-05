@@ -11,7 +11,36 @@ find_package(fmt REQUIRED)
 find_package(FFmpeg REQUIRED)
 find_package(CLI11 REQUIRED)
 
-add_executable(ffmpeg_wrapper src/main.cpp)
+set(CLI_SOURCES 
+    src/cli/Parser.cpp
+)
+
+set(COMMAND_SOURCES 
+    src/commands/ProbeCommand.cpp
+    src/commands/CastCommand.cpp
+)
+
+set(CORE_SOURCES 
+    src/main.cpp
+)
+
+add_executable(ffmpeg_wrapper 
+    ${CORE_SOURCES}
+    ${CLI_SOURCES}
+    ${COMMAND_SOURCES}
+)
+
+target_include_directories(ffmpeg_wrapper PRIVATE src)
+
+if(MSVC)
+    target_compile_options(ffmpeg_wrapper PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(ffmpeg_wrapper PRIVATE 
+    -Wall 
+    -Wextra 
+    -pedantic
+    )
+endif()
 
 target_link_libraries(ffmpeg_wrapper PRIVATE 
     fmt::fmt 
