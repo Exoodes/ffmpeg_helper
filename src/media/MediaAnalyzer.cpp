@@ -11,10 +11,11 @@ MediaAnalyzer::MediaAnalyzer(const std::string& file_path)
 MediaProperties MediaAnalyzer::analyze()
 {
   int result;
-  AVFormatContext* ctx_raw = avformat_alloc_context();
-  AVFormatContextPtr ctx(ctx_raw);
+  AVFormatContext* ctx_raw = nullptr;
 
   result = avformat_open_input(&ctx_raw, _file_path.c_str(), nullptr, nullptr);
+  AVFormatContextPtr ctx(ctx_raw);
+
   if(logAVERROR(result)) {
     return {};
   }
