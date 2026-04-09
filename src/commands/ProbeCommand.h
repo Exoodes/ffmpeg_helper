@@ -1,15 +1,20 @@
 #pragma once
 
-#include "ICommand.h"
-
 #include <string>
 
-class ProbeCommand : public ICommand {
+#include <media/MediaAnalyzer.h>
+
+#include "ICommand.h"
+
+class ProbeCommand : public ICommand
+{
 public:
-    ProbeCommand(const std::string& probe_input, const std::string& filename);
-    void execute() override;
+  ProbeCommand(const std::string& probe_input, const std::string& filename);
+  void execute() override;
 
 private:
-    std::string _probe_input;
-    std::string _filename;
+  void print_media_properties(const MediaProperties& properties);
+
+  std::string _probe_input;
+  std::string _filename;
 };
