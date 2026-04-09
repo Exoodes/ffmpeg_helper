@@ -1,0 +1,108 @@
+---
+Language: Cpp
+Standard: c++20
+
+# --- Indentation & Spacing ---
+IndentWidth: 2
+ContinuationIndentWidth: 2
+TabWidth: 2
+UseTab: Never
+ColumnLimit: 100
+NamespaceIndentation: None
+AccessModifierOffset: -2
+
+# --- Brace Wrapping ---
+# Functions use BSD style;
+# control statements use K&R style.  <-- FIXED (# added)
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: MultiLine
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: false
+  BeforeElse: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+
+# --- Penalties ---
+PenaltyBreakAssignment: 100
+PenaltyBreakBeforeFirstCallParameter: 0
+PenaltyReturnTypeOnItsOwnLine: 1000
+
+# --- Switch/Case ---
+IndentCaseLabels: false
+
+# --- Line Breaking & Chopping ---
+BreakInheritanceList: BeforeComma
+BreakConstructorInitializers: BeforeComma
+ConstructorInitializerIndentWidth: 2
+PackConstructorInitializers: Never
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: true
+BreakTemplateDeclarations: Yes
+
+# 2. Align the operands so the ? and : line up vertically
+AlignOperands: Align
+
+# Forces return type to stick to the function name
+AlwaysBreakAfterDefinitionReturnType: None
+
+# --- Function Arguments & Parameters ---
+# This combination forces the "Method Call" style you want:
+BinPackArguments: false
+BinPackParameters: false
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# This setting (BlockIndent) puts the ')' on a new line IF it wraps.
+AlignAfterOpenBracket: BlockIndent 
+
+# --- Spaces ---
+SpaceBeforeParens: Never
+SpaceBeforeAssignmentOperators: true
+
+# --- Comments ---
+# Keep manual Javadoc/@param wrapping and alignment.
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 1
+ReflowComments: Never
+
+
+# --- Other ---
+PointerAlignment: Left
+Cpp11BracedListStyle: true
+
+# --- Includes ---
+IncludeBlocks: Regroup
+SortIncludes: true
+
+
+IncludeCategories:
+
+  # 1. System Headers (all lowercase) in <...>
+  - Regex:           '^<[a-z0-9_./-]+>$'
+    Priority:        1
+    CaseSensitive:   true
+
+  # 2. All other headers in <...>
+  - Regex:           '^<.*>$'
+    Priority:        2
+
+  # 3. All headers in "..."
+  - Regex:           '^".*"$'
+    Priority:        3
+
+AllowShortFunctionsOnASingleLine: InlineOnly
+InsertBraces: true
+AllowShortBlocksOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: Never
+RemoveSemicolon: true
+
+FixNamespaceComments: true
+AlignEscapedNewlines: Left
+AlignArrayOfStructures: None
