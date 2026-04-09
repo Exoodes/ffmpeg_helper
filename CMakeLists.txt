@@ -11,6 +11,11 @@ find_package(fmt REQUIRED)
 find_package(FFmpeg REQUIRED)
 find_package(CLI11 REQUIRED)
 
+set(MEDIA_SOURCES 
+    src/media/MediaAnalyzer.cpp
+    src/media/Utility.cpp
+)
+
 set(CLI_SOURCES 
     src/cli/Parser.cpp
 )
@@ -28,6 +33,7 @@ add_executable(ffmpeg_wrapper
     ${CORE_SOURCES}
     ${CLI_SOURCES}
     ${COMMAND_SOURCES}
+    ${MEDIA_SOURCES}
 )
 
 target_include_directories(ffmpeg_wrapper PRIVATE src)
