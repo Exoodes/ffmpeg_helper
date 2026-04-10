@@ -2,12 +2,14 @@
 
 #include <fmt/core.h>
 
+// -------------------------------------------------------------------------------------------------
 ProbeCommand::ProbeCommand(const std::string& probe_input, const std::string& filename)
   : _probe_input(probe_input)
   , _filename(filename)
 {
 }
 
+// -------------------------------------------------------------------------------------------------
 void ProbeCommand::execute()
 {
   MediaAnalyzer analyzer(_probe_input);
@@ -15,28 +17,28 @@ void ProbeCommand::execute()
   print_media_properties(properties);
 }
 
+// -------------------------------------------------------------------------------------------------
 void ProbeCommand::print_media_properties(const MediaProperties& properties)
 {
   fmt::print("Container: {} ({})\n", properties.container_name, properties.container_long_name);
   fmt::print("Duration: {:.2f} seconds\n", properties.duration_seconds);
   fmt::print("Overall Bit Rate: {} bps\n", properties.overall_bit_rate);
-  fmt::print("File Size: {} bytes\n", properties.file_size_bytes);
+  fmt::print("File Size: {} bytes\n\n", properties.file_size_bytes);
 
-  for(size_t i = 0; i < properties.video_streams.size(); ++i) {
-    const auto& video_stream = properties.video_streams[i];
+  for(const auto& video_stream : properties.video_streams) {
     print_video_stream_info(video_stream);
   }
 
-  for(size_t i = 0; i < properties.audio_streams.size(); ++i) {
-    const auto& audio_stream = properties.audio_streams[i];
+  for(const auto& audio_stream : properties.audio_streams) {
     print_audio_stream_info(audio_stream);
   }
 }
 
+// -------------------------------------------------------------------------------------------------
 void ProbeCommand::print_video_stream_info(const VideoStream& video_stream)
 {
   fmt::print(
-    "Video Stream {}: {}x{}, {}/{} fps, {}, {}, profile: {}, bit_rate: {} bps\n",
+    "Video Stream {}: {}x{} @ {}/{} fps | {} | {} | Profile: {} | Bit Rate: {} bps\n",
     video_stream.index,
     video_stream.width,
     video_stream.height,
@@ -49,10 +51,11 @@ void ProbeCommand::print_video_stream_info(const VideoStream& video_stream)
   );
 }
 
+// -------------------------------------------------------------------------------------------------
 void ProbeCommand::print_audio_stream_info(const AudioStream& audio_stream)
 {
   fmt::print(
-    "Audio Stream {}: {} Hz, {} channels, {}, {}, {}, profile: {}, bit_rate: {} bps\n",
+    "Audio Stream {}: {} Hz | {} channels | {} | {} | {} | Profile: {} | Bit Rate: {} bps\n",
     audio_stream.index,
     audio_stream.sample_rate,
     audio_stream.channels,
