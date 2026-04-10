@@ -14,6 +14,8 @@ public:
 
 private:
   void print_media_properties(const MediaProperties& properties);
+  void print_video_stream_info(const VideoStream& video_stream);
+  void print_audio_stream_info(const AudioStream& audio_stream);
 
   std::string _probe_input;
   std::string _filename;
