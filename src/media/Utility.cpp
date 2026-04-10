@@ -19,3 +19,12 @@ bool logAVERROR(int averr)
   }
   return false;
 }
+
+std::string getStringFromCharArray(const char* char_array, std::string default_value)
+{
+  if(char_array) {
+    return std::string(char_array);
+  }
+
+  return default_value;
+}

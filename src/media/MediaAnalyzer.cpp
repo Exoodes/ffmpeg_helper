@@ -52,9 +52,10 @@ VideoStream MediaAnalyzer::extract_video_stream_info(AVStream* stream)
   VideoStream video_stream;
 
   video_stream.index = stream->index;
-  video_stream.codec_name = avcodec_get_name(stream->codecpar->codec_id);
-  video_stream.profile =
-    avcodec_profile_name(stream->codecpar->codec_id, stream->codecpar->profile);
+  video_stream.codec_name = getStringFromCharArray(avcodec_get_name(stream->codecpar->codec_id));
+  video_stream.profile = getStringFromCharArray(
+    avcodec_profile_name(stream->codecpar->codec_id, stream->codecpar->profile)
+  );
 
   video_stream.width = stream->codecpar->width;
   video_stream.height = stream->codecpar->height;
@@ -62,8 +63,8 @@ VideoStream MediaAnalyzer::extract_video_stream_info(AVStream* stream)
   video_stream.fps_den = stream->avg_frame_rate.den;
   video_stream.bit_rate = stream->codecpar->bit_rate;
 
-  video_stream.pixel_format = av_get_pix_fmt_name(
-    static_cast<AVPixelFormat>(stream->codecpar->format)
+  video_stream.pixel_format = getStringFromCharArray(
+    av_get_pix_fmt_name(static_cast<AVPixelFormat>(stream->codecpar->format))
   );
 
   return video_stream;
@@ -75,9 +76,10 @@ AudioStream MediaAnalyzer::extract_audio_stream_info(AVStream* stream)
   AudioStream audio_stream;
 
   audio_stream.index = stream->index;
-  audio_stream.codec_name = avcodec_get_name(stream->codecpar->codec_id);
-  audio_stream.profile =
-    avcodec_profile_name(stream->codecpar->codec_id, stream->codecpar->profile);
+  audio_stream.codec_name = getStringFromCharArray(avcodec_get_name(stream->codecpar->codec_id));
+  audio_stream.profile = getStringFromCharArray(
+    avcodec_profile_name(stream->codecpar->codec_id, stream->codecpar->profile)
+  );
 
   audio_stream.sample_rate = stream->codecpar->sample_rate;
   audio_stream.channels = stream->codecpar->ch_layout.nb_channels;
@@ -88,10 +90,12 @@ AudioStream MediaAnalyzer::extract_audio_stream_info(AVStream* stream)
     sizeof(channel_layout_buf)
   );
   audio_stream.channel_layout = channel_layout_buf;
-  audio_stream.sample_format = av_get_sample_fmt_name(
-    static_cast<AVSampleFormat>(stream->codecpar->format)
+  audio_stream.sample_format = getStringFromCharArray(
+    av_get_sample_fmt_name(static_cast<AVSampleFormat>(stream->codecpar->format))
   );
   audio_stream.bit_rate = stream->codecpar->bit_rate;
 
   return audio_stream;
 }
+
+// -------------------------------------------------------------------------------------------------
