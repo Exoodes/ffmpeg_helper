@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Probe (Agnostic)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [
+                "probe",
+                "Flying Objects H.264-1080p60-VBR36MBit.mp4"
+            ],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

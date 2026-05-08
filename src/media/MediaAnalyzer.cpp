@@ -97,5 +97,3 @@ AudioStream MediaAnalyzer::extract_audio_stream_info(AVStream* stream)
 
   return audio_stream;
 }
-
-// -------------------------------------------------------------------------------------------------
