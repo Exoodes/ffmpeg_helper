@@ -69,7 +69,13 @@ CLI::App* CLParser::add_bitrate_subcommand(CLI::App& app, BitrateCommandPayload&
 
   bitrate_subcommand->add_option("input-path", payload.input_path, "Path to the input file")
     ->required();
-  bitrate_subcommand->add_option("output-path", payload.output_path, "Path to the output file");
+
+  bitrate_subcommand->add_option("output-path", payload.output_path, "Path to the output file")
+    ->default_val("bitrate_plot.png");
+
+  bitrate_subcommand
+    ->add_option("--interval", payload.interval_ms, "Time interval in ms for bitrate calculation")
+    ->default_val(500);
 
   return bitrate_subcommand;
 }

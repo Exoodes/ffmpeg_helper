@@ -21,14 +21,28 @@ std::map<uint32_t, BitrateHistogram> BitrateScanner::scan()
 
   while(av_read_frame(_ctx.get(), packet) >= 0) {
     int stream_index = packet->stream_index;
+    AVStream* stream = _ctx->streams[stream_index];
+
+    if(
+      stream->codecpar->codec_type != AVMEDIA_TYPE_VIDEO &&
+      stream->codecpar->codec_type != AVMEDIA_TYPE_AUDIO
+    )
+    {
+      av_packet_unref(packet);
+      continue;
+    }
+
     int64_t pts = packet->pts;
-    AVRational time_base = _ctx->streams[stream_index]->time_base;
+    AVRational time_base = stream->time_base;
 
     double time_seconds = pts * av_q2d(time_base);
     uint32_t time_ms = static_cast<uint32_t>(time_seconds * 1000);
     uint32_t interval_index = time_ms / _time_interval_ms;
 
-    histograms[stream_index].time_interval_ms = _time_interval_ms;
+    if(histograms[stream_index].time_interval_ms == 0) {
+      histograms[stream_index].time_interval_ms = _time_interval_ms;
+    }
+
     histograms[stream_index].data[interval_index] += packet->size;
 
     av_packet_unref(packet);

@@ -48,6 +48,11 @@ set(COMMAND_SOURCES
     src/commands/ICommand.h
 )
 
+set(SERVICE_SOURCES
+    src/services/BitratePlotter.cpp
+    src/services/BitratePlotter.hpp
+)
+
 set(CORE_SOURCES 
     src/main.cpp
 )
@@ -57,6 +62,7 @@ add_executable(ffmpeg_wrapper
     ${CLI_SOURCES}
     ${COMMAND_SOURCES}
     ${MEDIA_SOURCES}
+    ${SERVICE_SOURCES}
 )
 
 target_include_directories(ffmpeg_wrapper PRIVATE src)
