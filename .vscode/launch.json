@@ -22,7 +22,7 @@
                 "Flying Objects H.264-1080p60-VBR36MBit.mp4",
                 "my_custom_chart.png",
                 "--interval",
-                "1000"
+                "2000"
             ],
             "cwd": "${workspaceFolder}"
         }

@@ -77,5 +77,14 @@ CLI::App* CLParser::add_bitrate_subcommand(CLI::App& app, BitrateCommandPayload&
     ->add_option("--interval", payload.interval_ms, "Time interval in ms for bitrate calculation")
     ->default_val(500);
 
+  bitrate_subcommand
+    ->add_option("-s,--stream", payload.streams, "Specific stream indices to plot (e.g., -s 0 1)");
+
+  bitrate_subcommand->add_flag(
+    "-a,--aggregate",
+    payload.aggregate,
+    "Aggregate selected streams into a single plot"
+  );
+
   return bitrate_subcommand;
 }

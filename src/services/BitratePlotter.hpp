@@ -9,7 +9,7 @@ class BitratePlotter
 {
 public:
   static void plot(
-    const std::map<uint32_t, BitrateHistogram>& histograms,
+    const std::map<std::string, BitrateHistogram>& histograms,
     const std::string& output_path
   );
 };
