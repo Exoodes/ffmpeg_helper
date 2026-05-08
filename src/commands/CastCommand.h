@@ -1,15 +1,21 @@
 #pragma once
 
-#include "ICommand.h"
-
 #include <string>
 
-class CastCommand : public ICommand {
+#include "ICommand.h"
+
+struct CastCommandPayload
+{
+  std::string input_path;
+  std::string target_url;
+};
+
+class CastCommand : public ICommand
+{
 public:
-    CastCommand(const std::string& cast_input, const std::string& target_url);
-    void execute() override;
+  CastCommand(const CastCommandPayload& payload);
+  void execute() override;
 
 private:
-    std::string _cast_input;
-    std::string _target_url;
+  CastCommandPayload _payload;
 };

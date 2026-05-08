@@ -7,10 +7,16 @@
 
 #include "ICommand.h"
 
+struct ProbeCommandPayload
+{
+  std::string input_path;
+  std::string config_file;
+};
+
 class ProbeCommand : public ICommand
 {
 public:
-  ProbeCommand(const std::string& probe_input, const std::string& filename);
+  ProbeCommand(const ProbeCommandPayload& payload);
   void execute() override;
 
 private:
@@ -20,6 +26,5 @@ private:
   void print_tags(const std::map<std::string, std::string>& tags, const std::string& indent);
   void print_chapters(const std::vector<Chapter>& chapters);
 
-  std::string _probe_input;
-  std::string _filename;
+  ProbeCommandPayload _payload;
 };

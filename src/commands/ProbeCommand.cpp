@@ -30,16 +30,15 @@ static std::string format_bitrate(int64_t bitrate)
 }
 
 // -------------------------------------------------------------------------------------------------
-ProbeCommand::ProbeCommand(const std::string& probe_input, const std::string& filename)
-  : _probe_input(probe_input)
-  , _filename(filename)
+ProbeCommand::ProbeCommand(const ProbeCommandPayload& payload)
+  : _payload(payload)
 {
 }
 
 // -------------------------------------------------------------------------------------------------
 void ProbeCommand::execute()
 {
-  MediaAnalyzer analyzer(_probe_input);
+  MediaAnalyzer analyzer(_payload.input_path);
   MediaProperties properties = analyzer.analyze();
   print_media_properties(properties);
 }
