@@ -25,17 +25,27 @@ FetchContent_MakeAvailable(matplotplusplus)
 
 set(MEDIA_SOURCES 
     src/media/MediaAnalyzer.cpp
+    src/media/MediaAnalyzer.h
     src/media/Utility.cpp
+    src/media/Utility.h
+    src/media/SmartPointers.h
+    src/media/FFmpegHeaders.h
+    src/media/MediaStructs.hpp
 )
 
 set(CLI_SOURCES 
     src/cli/Parser.cpp
+    src/cli/Parser.h
 )
 
 set(COMMAND_SOURCES 
     src/commands/ProbeCommand.cpp
+    src/commands/ProbeCommand.h
     src/commands/CastCommand.cpp
+    src/commands/CastCommand.h
     src/commands/BitrateCommand.cpp
+    src/commands/BitrateCommand.h
+    src/commands/ICommand.h
 )
 
 set(CORE_SOURCES 

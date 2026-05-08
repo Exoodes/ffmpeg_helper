@@ -25,4 +25,9 @@ bool logAVERROR(int averr);
  * 
  * @return std::string The converted string, or default_value if char_array is nullptr.
  */
-std::string getStringFromCharArray(const char* char_array, std::string default_value = "");
+std::string getStringFromCharArray(const char* char_array, std::string default_value);
+
+inline std::string getStringFromCharArray(const char* char_array)
+{
+  return getStringFromCharArray(char_array, "");
+}
