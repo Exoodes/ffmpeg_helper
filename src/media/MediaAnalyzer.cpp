@@ -1,7 +1,43 @@
 #include "MediaAnalyzer.h"
 
+#include <fmt/core.h>
+
 #include "FFmpegHeaders.h"
 #include "Utility.h"
+
+// -------------------------------------------------------------------------------------------------
+BitrateScanner::BitrateScanner(uint32_t time_interval_ms, AVFormatContextPtr ctx)
+  : _time_interval_ms(time_interval_ms)
+  , _ctx(std::move(ctx))
+{
+}
+
+// -------------------------------------------------------------------------------------------------
+std::map<uint32_t, BitrateHistogram> BitrateScanner::scan()
+{
+  std::map<uint32_t, BitrateHistogram> histograms;
+
+  AVPacket* packet = av_packet_alloc();
+
+  while(av_read_frame(_ctx.get(), packet) >= 0) {
+    int stream_index = packet->stream_index;
+    int64_t pts = packet->pts;
+    AVRational time_base = _ctx->streams[stream_index]->time_base;
+
+    double time_seconds = pts * av_q2d(time_base);
+    uint32_t time_ms = static_cast<uint32_t>(time_seconds * 1000);
+    uint32_t interval_index = time_ms / _time_interval_ms;
+
+    histograms[stream_index].time_interval_ms = _time_interval_ms;
+    histograms[stream_index].data[interval_index] += packet->size;
+
+    av_packet_unref(packet);
+  }
+
+  av_packet_free(&packet);
+
+  return histograms;
+}
 
 // -------------------------------------------------------------------------------------------------
 MediaAnalyzer::MediaAnalyzer(const std::string& file_path)
@@ -23,17 +59,12 @@ std::map<std::string, std::string> MediaAnalyzer::extract_metadata(AVDictionary*
 // -------------------------------------------------------------------------------------------------
 MediaProperties MediaAnalyzer::analyze()
 {
-  int result;
-  AVFormatContext* ctx_raw = nullptr;
-
-  result = avformat_open_input(&ctx_raw, _file_path.c_str(), nullptr, nullptr);
-  AVFormatContextPtr ctx(ctx_raw);
-
-  if(logAVERROR(result)) {
+  AVFormatContextPtr ctx = open_input(_file_path);
+  if(!ctx) {
     return {};
   }
 
-  result = avformat_find_stream_info(ctx.get(), nullptr);
+  int result = avformat_find_stream_info(ctx.get(), nullptr);
   if(logAVERROR(result)) {
     return {};
   }
@@ -72,6 +103,31 @@ MediaProperties MediaAnalyzer::analyze()
   }
 
   return properties;
+}
+
+// -------------------------------------------------------------------------------------------------
+std::map<uint32_t, BitrateHistogram> MediaAnalyzer::analyze_bitrate(uint32_t time_interval_ms)
+{
+  AVFormatContextPtr ctx = open_input(_file_path);
+  if(!ctx) {
+    return {};
+  }
+
+  BitrateScanner scanner(time_interval_ms, std::move(ctx));
+  std::map<uint32_t, BitrateHistogram> histograms = scanner.scan();
+  return histograms;
+}
+
+// -------------------------------------------------------------------------------------------------
+AVFormatContextPtr MediaAnalyzer::open_input(const std::string& file_path)
+{
+  AVFormatContext* ctx_raw = nullptr;
+  int result = avformat_open_input(&ctx_raw, file_path.c_str(), nullptr, nullptr);
+  if(logAVERROR(result)) {
+    return nullptr;
+  }
+
+  return AVFormatContextPtr(ctx_raw);
 }
 
 // -------------------------------------------------------------------------------------------------

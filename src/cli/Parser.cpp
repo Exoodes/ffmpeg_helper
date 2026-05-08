@@ -14,6 +14,9 @@ std::unique_ptr<ICommand> CLParser::parse_arguments(int argc, char** argv)
   CastCommandPayload cast_payload;
   CLI::App* cast_subcommand = add_cast_subcommand(app, cast_payload);
 
+  BitrateCommandPayload bitrate_payload;
+  CLI::App* bitrate_subcommand = add_bitrate_subcommand(app, bitrate_payload);
+
   try {
     app.parse(argc, argv);
   } catch(const CLI::ParseError& e) {
@@ -26,6 +29,10 @@ std::unique_ptr<ICommand> CLParser::parse_arguments(int argc, char** argv)
 
   if(*cast_subcommand) {
     return std::make_unique<CastCommand>(cast_payload);
+  }
+
+  if(*bitrate_subcommand) {
+    return std::make_unique<BitrateCommand>(bitrate_payload);
   }
 
   return nullptr;
@@ -53,4 +60,16 @@ CLI::App* CLParser::add_cast_subcommand(CLI::App& app, CastCommandPayload& paylo
   cast_subcommand->add_option("--target", payload.target_url, "Destination URL")->required();
 
   return cast_subcommand;
+}
+
+// -------------------------------------------------------------------------------------------------
+CLI::App* CLParser::add_bitrate_subcommand(CLI::App& app, BitrateCommandPayload& payload)
+{
+  CLI::App* bitrate_subcommand = app.add_subcommand("bitrate", "Calculate bitrate of media files");
+
+  bitrate_subcommand->add_option("input-path", payload.input_path, "Path to the input file")
+    ->required();
+  bitrate_subcommand->add_option("output-path", payload.output_path, "Path to the output file");
+
+  return bitrate_subcommand;
 }

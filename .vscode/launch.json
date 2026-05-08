@@ -11,6 +11,17 @@
                 "Flying Objects H.264-1080p60-VBR36MBit.mp4"
             ],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run Bitrate",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [
+                "bitrate",
+                "Flying Objects H.264-1080p60-VBR36MBit.mp4"
+            ],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
