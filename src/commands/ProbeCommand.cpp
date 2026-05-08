@@ -18,12 +18,52 @@ void ProbeCommand::execute()
 }
 
 // -------------------------------------------------------------------------------------------------
+void ProbeCommand::print_tags(
+  const std::map<std::string, std::string>& tags,
+  const std::string& indent
+)
+{
+  if(!tags.empty()) {
+    fmt::print("{}Metadata Tags:\n", indent);
+    for(const auto& tag : tags) {
+      fmt::print("{}  {}: {}\n", indent, tag.first, tag.second);
+    }
+  }
+}
+
+// -------------------------------------------------------------------------------------------------
+void ProbeCommand::print_chapters(const std::vector<Chapter>& chapters)
+{
+  if(!chapters.empty()) {
+    fmt::print("Chapters:\n");
+    for(const auto& chapter : chapters) {
+      fmt::print(
+        "  Chapter {}: Start: {:.3f}s, End: {:.3f}s\n",
+        chapter.id,
+        chapter.start_time,
+        chapter.end_time
+      );
+      print_tags(chapter.tags, "    ");
+    }
+  }
+}
+
+// -------------------------------------------------------------------------------------------------
 void ProbeCommand::print_media_properties(const MediaProperties& properties)
 {
   fmt::print("Container: {} ({})\n", properties.container_name, properties.container_long_name);
+  fmt::print("Start Time: {:.3f} seconds\n", properties.start_time_seconds);
   fmt::print("Duration: {:.2f} seconds\n", properties.duration_seconds);
   fmt::print("Overall Bit Rate: {} bps\n", properties.overall_bit_rate);
-  fmt::print("File Size: {} bytes\n\n", properties.file_size_bytes);
+  fmt::print("File Size: {} bytes\n", properties.file_size_bytes);
+
+  print_tags(properties.tags, "");
+  fmt::print("\n");
+
+  print_chapters(properties.chapters);
+  if(!properties.chapters.empty()) {
+    fmt::print("\n");
+  }
 
   for(const auto& video_stream : properties.video_streams) {
     print_video_stream_info(video_stream);
@@ -49,6 +89,19 @@ void ProbeCommand::print_video_stream_info(const VideoStream& video_stream)
     video_stream.profile,
     video_stream.bit_rate
   );
+  fmt::print("  Time Base: {}/{}\n", video_stream.time_base_num, video_stream.time_base_den);
+  fmt::print("  Start Time: {:.3f}s\n", video_stream.start_time);
+  fmt::print("  Total Frames: {}\n", video_stream.total_frames);
+  fmt::print(
+    "  Color Space: {} | Primaries: {} | TRC: {} | HDR: {}\n",
+    video_stream.color_space.empty() ? "Unknown" : video_stream.color_space,
+    video_stream.color_primaries.empty() ? "Unknown" : video_stream.color_primaries,
+    video_stream.color_trc.empty() ? "Unknown" : video_stream.color_trc,
+    video_stream.is_hdr ? "Yes" : "No"
+  );
+  fmt::print("  Field Order: {}\n", video_stream.field_order);
+  print_tags(video_stream.tags, "  ");
+  fmt::print("\n");
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -65,4 +118,9 @@ void ProbeCommand::print_audio_stream_info(const AudioStream& audio_stream)
     audio_stream.profile,
     audio_stream.bit_rate
   );
+  fmt::print("  Time Base: {}/{}\n", audio_stream.time_base_num, audio_stream.time_base_den);
+  fmt::print("  Start Time: {:.3f}s\n", audio_stream.start_time);
+  fmt::print("  Total Frames: {}\n", audio_stream.total_frames);
+  print_tags(audio_stream.tags, "  ");
+  fmt::print("\n");
 }

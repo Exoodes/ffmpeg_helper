@@ -1,9 +1,19 @@
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
 
 #include "SmartPointers.h"
+
+// -------------------------------------------------------------------------------------------------
+struct Chapter
+{
+  int id;
+  double start_time;
+  double end_time;
+  std::map<std::string, std::string> tags;
+};
 
 // -------------------------------------------------------------------------------------------------
 struct VideoStream
@@ -27,6 +37,15 @@ struct VideoStream
   std::string color_primaries; // e.g., "bt709", "bt2020"
   std::string color_trc;       // Transfer characteristics, e.g., "smpte2084" (PQ for HDR)
   bool is_hdr;                 // A helper boolean you can set if color_trc indicates HDR
+
+  // Technical stream properties
+  int time_base_num;
+  int time_base_den;
+  double start_time;
+  int64_t total_frames;
+
+  // Track Metadata Tags
+  std::map<std::string, std::string> tags;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -43,6 +62,15 @@ struct AudioStream
   std::string channel_layout; // e.g., "stereo", "5.1(side)"
   std::string sample_format;  // e.g., "s16p" (16-bit), "fltp" (32-bit float)
   int64_t bit_rate;           // e.g., 320000 (320 kbps)
+
+  // Technical stream properties
+  int time_base_num;
+  int time_base_den;
+  double start_time;
+  int64_t total_frames;
+
+  // Track Metadata Tags
+  std::map<std::string, std::string> tags;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -53,13 +81,18 @@ struct MediaProperties
   std::string container_long_name; // e.g., "Matroska / WebM"
 
   // Timings and sizes
+  double start_time_seconds;
   double duration_seconds;  // Converted from ctx->duration
   int64_t overall_bit_rate; // ctx->bit_rate
   int64_t file_size_bytes;  // avio_size(ctx->pb)
 
+  // Global Metadata Tags
+  std::map<std::string, std::string> tags;
+
   // The media tracks and chapters
   std::vector<VideoStream> video_streams;
   std::vector<AudioStream> audio_streams;
+  std::vector<Chapter> chapters;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -72,6 +105,7 @@ public:
 private:
   VideoStream extract_video_stream_info(AVStream* stream);
   AudioStream extract_audio_stream_info(AVStream* stream);
+  std::map<std::string, std::string> extract_metadata(AVDictionary* dict);
 
   std::string _file_path;
 };

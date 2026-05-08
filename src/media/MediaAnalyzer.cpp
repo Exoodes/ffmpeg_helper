@@ -10,6 +10,17 @@ MediaAnalyzer::MediaAnalyzer(const std::string& file_path)
 }
 
 // -------------------------------------------------------------------------------------------------
+std::map<std::string, std::string> MediaAnalyzer::extract_metadata(AVDictionary* dict)
+{
+  std::map<std::string, std::string> tags;
+  AVDictionaryEntry* tag = nullptr;
+  while((tag = av_dict_get(dict, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+    tags[tag->key] = tag->value;
+  }
+  return tags;
+}
+
+// -------------------------------------------------------------------------------------------------
 MediaProperties MediaAnalyzer::analyze()
 {
   int result;
@@ -30,9 +41,26 @@ MediaProperties MediaAnalyzer::analyze()
   MediaProperties properties;
   properties.container_name = ctx->iformat->name;
   properties.container_long_name = ctx->iformat->long_name;
+
+  properties.start_time_seconds = ctx->start_time == AV_NOPTS_VALUE
+                                    ? 0.0
+                                    : ctx->start_time / static_cast<double>(AV_TIME_BASE);
   properties.duration_seconds = ctx->duration / static_cast<double>(AV_TIME_BASE);
   properties.overall_bit_rate = ctx->bit_rate;
   properties.file_size_bytes = avio_size(ctx->pb);
+
+  properties.tags = extract_metadata(ctx->metadata);
+
+  for(unsigned int i = 0; i < ctx->nb_chapters; ++i) {
+    auto* chap = ctx->chapters[i];
+    Chapter chapter;
+    chapter.id = chap->id;
+    double tb = av_q2d(chap->time_base);
+    chapter.start_time = chap->start == AV_NOPTS_VALUE ? 0.0 : chap->start * tb;
+    chapter.end_time = chap->end == AV_NOPTS_VALUE ? 0.0 : chap->end * tb;
+    chapter.tags = extract_metadata(chap->metadata);
+    properties.chapters.push_back(chapter);
+  }
 
   for(unsigned int i = 0; i < ctx->nb_streams; ++i) {
     auto* stream = ctx->streams[i];
@@ -67,6 +95,50 @@ VideoStream MediaAnalyzer::extract_video_stream_info(AVStream* stream)
     av_get_pix_fmt_name(static_cast<AVPixelFormat>(stream->codecpar->format))
   );
 
+  video_stream.color_space = getStringFromCharArray(
+    av_color_space_name(stream->codecpar->color_space)
+  );
+  video_stream.color_primaries = getStringFromCharArray(
+    av_color_primaries_name(stream->codecpar->color_primaries)
+  );
+  video_stream.color_trc = getStringFromCharArray(
+    av_color_transfer_name(stream->codecpar->color_trc)
+  );
+
+  video_stream.is_hdr =
+    (stream->codecpar->color_trc == AVCOL_TRC_SMPTE2084 ||
+     stream->codecpar->color_trc == AVCOL_TRC_ARIB_STD_B67);
+
+  switch(stream->codecpar->field_order) {
+  case AV_FIELD_PROGRESSIVE:
+    video_stream.field_order = "Progressive";
+    break;
+  case AV_FIELD_TT:
+    video_stream.field_order = "Top Field First";
+    break;
+  case AV_FIELD_BB:
+    video_stream.field_order = "Bottom Field First";
+    break;
+  case AV_FIELD_TB:
+    video_stream.field_order = "Top Bottom";
+    break;
+  case AV_FIELD_BT:
+    video_stream.field_order = "Bottom Top";
+    break;
+  default:
+    video_stream.field_order = "Unknown";
+    break;
+  }
+
+  video_stream.time_base_num = stream->time_base.num;
+  video_stream.time_base_den = stream->time_base.den;
+  video_stream.start_time = stream->start_time == AV_NOPTS_VALUE
+                              ? 0.0
+                              : stream->start_time * av_q2d(stream->time_base);
+  video_stream.total_frames = stream->nb_frames;
+
+  video_stream.tags = extract_metadata(stream->metadata);
+
   return video_stream;
 }
 
@@ -94,6 +166,15 @@ AudioStream MediaAnalyzer::extract_audio_stream_info(AVStream* stream)
     av_get_sample_fmt_name(static_cast<AVSampleFormat>(stream->codecpar->format))
   );
   audio_stream.bit_rate = stream->codecpar->bit_rate;
+
+  audio_stream.time_base_num = stream->time_base.num;
+  audio_stream.time_base_den = stream->time_base.den;
+  audio_stream.start_time = stream->start_time == AV_NOPTS_VALUE
+                              ? 0.0
+                              : stream->start_time * av_q2d(stream->time_base);
+  audio_stream.total_frames = stream->nb_frames;
+
+  audio_stream.tags = extract_metadata(stream->metadata);
 
   return audio_stream;
 }
